@@ -1,8 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useGetJobsQuery } from "../../features/job/jobApi";
 
 const JobCard = ({ jobData }) => {
+
   const navigate = useNavigate();
+
   const { _id, position, companyName, location, employmentType } =
     jobData || {};
 
