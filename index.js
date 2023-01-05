@@ -30,7 +30,39 @@ const run = async () => {
       res.send(result);
     });
 
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
 
+      const result = await userCollection.findOne({ email });
+
+      if (result?.email) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
+
+    app.get("/jobs", async (req, res) => {
+      const cursor = jobCollection.find({});
+      const result = await cursor.toArray();
+      res.send({ status: true, data: result });
+    });
+
+    app.get("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id)
+      const result = await jobCollection.findOne({ _id: ObjectId(id) });
+      console.log(result)
+      res.send({ status: true, data: result });
+    });
+
+    app.post("/job", async (req, res) => {
+      const job = req.body;
+      console.log(job)
+      const result = await jobCollection.insertOne(job);
+
+      res.send({ status: true, data: result });
+    });
   } finally {
   }
 };
