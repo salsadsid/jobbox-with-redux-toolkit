@@ -11,6 +11,7 @@ const EmployerRegistration = () => {
   const term = useWatch({ control, name: "term" });
   const navigate = useNavigate();
   const [postUser, { isLoading, isError }] = useRegisterMutation()
+  // console.log(isLoading, isError)
   const businessCategory = [
     "Automotive",
     "Business Support & Supplies",
