@@ -63,6 +63,32 @@ const run = async () => {
 
       res.send({ status: true, data: result });
     });
+    app.patch("/apply", async (req, res) => {
+      const userId = req.body.userId;
+      const jobId = req.body.jobId;
+      const email = req.body.email;
+
+      const filter = { _id: ObjectId(jobId) };
+      const updateDoc = {
+        $push: { applicants: { id: ObjectId(userId), email } },
+      };
+
+      const result = await jobCollection.updateOne(filter, updateDoc);
+
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
+    app.get("/applied-jobs/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { applicants: { $elemMatch: { email: email } } };
+      const cursor = jobCollection.find(query).project({ applicants: 0 });
+      const result = await cursor.toArray();
+
+      res.send({ status: true, data: result });
+    });
   } finally {
   }
 };
