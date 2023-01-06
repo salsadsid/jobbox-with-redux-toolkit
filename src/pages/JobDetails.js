@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import meeting from "../assets/meeting.jpg";
 import { BsArrowRightShort, BsArrowReturnRight } from "react-icons/bs";
-import { useJobByIdQuery } from "../features/job/jobApi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useApplyJobMutation, useJobByIdQuery } from "../features/job/jobApi";
+import { useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
 const JobDetails = () => {
   const { id } = useParams()
   console.log(id)
-  const { data, isError, isLoading } = useJobByIdQuery(id)
-  console.log(data)
+  const { data, isLoading } = useJobByIdQuery(id)
+  console.log(data?.data)
+  const { user } = useSelector(state => state.auth)
+  const navigate = useNavigate()
   const {
     companyName,
     position,
@@ -24,7 +28,26 @@ const JobDetails = () => {
     queries,
     _id,
   } = data?.data || {};
+  console.log(companyName)
+  const [apply] = useApplyJobMutation()
+  const handleApply = () => {
 
+    if (user.role === "employer") {
+      toast.error("You need a candidate account to apply")
+      return;
+    }
+    if (user.role === "") {
+      navigate('/register')
+      return;
+    }
+    const data = {
+      userId: user._id,
+      email: user.email,
+      jobId: _id
+    }
+    console.log(data)
+    apply(data)
+  }
   return (
     <div className='pt-14 grid grid-cols-12 gap-5'>
       <div className='col-span-9 mb-10'>
@@ -34,7 +57,7 @@ const JobDetails = () => {
         <div className='space-y-5'>
           <div className='flex justify-between items-center mt-5'>
             <h1 className='text-xl font-semibold text-primary'>{position}</h1>
-            <button className='btn'>Apply</button>
+            <button className='btn' onClick={handleApply}>Apply</button>
           </div>
           <div>
             <h1 className='text-primary text-lg font-medium mb-3'>Overview</h1>
@@ -43,7 +66,7 @@ const JobDetails = () => {
           <div>
             <h1 className='text-primary text-lg font-medium mb-3'>Skills</h1>
             <ul>
-              {skills.map((skill) => (
+              {skills?.map((skill) => (
                 <li className='flex items-center'>
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -55,7 +78,7 @@ const JobDetails = () => {
               Requirements
             </h1>
             <ul>
-              {requirements.map((skill) => (
+              {requirements?.map((skill) => (
                 <li className='flex items-center'>
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -67,7 +90,7 @@ const JobDetails = () => {
               Responsibilities
             </h1>
             <ul>
-              {responsibilities.map((skill) => (
+              {responsibilities?.map((skill) => (
                 <li className='flex items-center'>
                   <BsArrowRightShort /> <span>{skill}</span>
                 </li>
@@ -82,7 +105,7 @@ const JobDetails = () => {
               General Q&A
             </h1>
             <div className='text-primary my-2'>
-              {queries.map(({ question, email, reply, id }) => (
+              {queries?.map(({ question, email, reply, id }) => (
                 <div>
                   <small>{email}</small>
                   <p className='text-lg font-medium'>{question}</p>
