@@ -11,7 +11,7 @@ const JobDetails = () => {
   const [reply, setReply] = useState("")
   const { id } = useParams()
   console.log(id)
-  const { data, isLoading } = useJobByIdQuery(id)
+  const { data, isLoading } = useJobByIdQuery(id, { pollingInterval: 1000 })
   console.log(data?.data)
   const { user } = useSelector(state => state.auth)
   const navigate = useNavigate()
