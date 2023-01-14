@@ -18,7 +18,7 @@ export const createUser = createAsyncThunk('auth/createUser', async ({ email, pa
 export const getUser = createAsyncThunk('auth/getUser', async (email) => {
     const res = await fetch(`${process.env.REACT_APP_DEV_URL}user/${email}`)
     const data = await res.json()
-    if (data.status) {
+    if (data?.status) {
         return data
     }
     return email

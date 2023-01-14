@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import meeting from "../assets/meeting.jpg";
 import { BsArrowRightShort, BsArrowReturnRight } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
-import { useApplyJobMutation, useAskQuestionMutation, useJobByIdQuery, useSendReplyMutation } from "../features/job/jobApi";
+import { useApplyJobMutation, useAskQuestionMutation, useJobByIdQuery, useJobStatusMutation, useSendReplyMutation } from "../features/job/jobApi";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ const JobDetails = () => {
   const [reply, setReply] = useState("")
   const { id } = useParams()
   console.log(id)
-  const { data, isLoading } = useJobByIdQuery(id, { pollingInterval: 1000 })
+  const { data, isLoading } = useJobByIdQuery(id)
   console.log(data?.data)
   const { user } = useSelector(state => state.auth)
   const navigate = useNavigate()
@@ -32,9 +32,12 @@ const JobDetails = () => {
     overview,
     queries,
     _id,
+    applicants,
+    status
   } = data?.data || {};
   console.log(companyName)
   const [apply] = useApplyJobMutation()
+  const [jobStatus] = useJobStatusMutation()
   const handleApply = () => {
 
     if (user.role === "employer") {
@@ -72,6 +75,15 @@ const JobDetails = () => {
     console.log(data)
     sendReply(data)
   }
+
+  const handleJobStatus = () => {
+    const data = {
+      jobId: _id,
+      status: "closed"
+    }
+    jobStatus(data)
+  }
+
   return (
     <div className='pt-14 grid grid-cols-12 gap-5'>
       <div className='col-span-9 mb-10'>
@@ -222,6 +234,26 @@ const JobDetails = () => {
               https://website.com
             </a>
           </div>
+          <div>
+            <p>Status</p>
+            <p className='font-semibold text-lg'>{status}</p>
+            {user?.role === "employer" && status === "open" && <button className='btn' onClick={handleJobStatus}>Terminate this job
+            </button>}
+          </div>
+          {user?.role === "employer" && <div>
+            <p>Application Count</p>
+            <p className='font-semibold text-lg'>{applicants?.length}</p>
+          </div>}
+          {user?.role === "employer" && <div>
+            <p className='font-semibold text-lg'>Applied Candidates</p>
+            {
+              applicants?.map((applicant) => (
+                <div><p>{applicant.email}</p>
+                  <button onClick={() => navigate(`/user/${applicant?.email}`)}>View Details</button>
+                </div>
+              ))
+            }
+          </div>}
         </div>
       </div>
     </div>
