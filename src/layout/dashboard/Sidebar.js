@@ -15,7 +15,7 @@ const Sidebar = () => {
     {
       name: "Applied Jobs",
       path: "applied-jobs"
-    }
+    },
   ]
   return (
     <div className='bg-primary/10 col-span-2 h-screen sticky top-0'>

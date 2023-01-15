@@ -25,7 +25,7 @@ const CandidateRegistration = () => {
 
   const onSubmit = (data) => {
     console.log(data)
-    postUser({ ...data, role: "candidate" })
+    postUser({ ...data, role: "candidate", chat: [] })
   };
 
   return (

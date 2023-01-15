@@ -23,8 +23,22 @@ const authApi = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/user-detail/${id}`
             })
-        })
+        }),
+        sendMessage: builder.mutation({
+            query: (data) => ({
+                url: "/send",
+                method: "PATCH",
+                body: data
+            }),
+        }),
+        sendMsgReply: builder.mutation({
+            query: (data) => ({
+                url: "/msg-reply",
+                method: "PATCH",
+                body: data
+            }),
+        }),
     })
 })
 
-export const { useRegisterMutation, useGetUserDetailsQuery } = authApi
+export const { useRegisterMutation, useGetUserDetailsQuery, useSendMessageMutation, useSendMsgReplyMutation } = authApi
