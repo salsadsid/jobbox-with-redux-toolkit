@@ -18,6 +18,8 @@ const JobDetails = () => {
   const { register, handleSubmit, reset } = useForm()
   const [postQuestion] = useAskQuestionMutation()
   const [sendReply] = useSendReplyMutation()
+  const [apply] = useApplyJobMutation()
+  const [jobStatus] = useJobStatusMutation()
   const {
     companyName,
     position,
@@ -36,8 +38,6 @@ const JobDetails = () => {
     status
   } = data?.data || {};
   console.log(companyName)
-  const [apply] = useApplyJobMutation()
-  const [jobStatus] = useJobStatusMutation()
   const handleApply = () => {
 
     if (user.role === "employer") {
@@ -83,7 +83,6 @@ const JobDetails = () => {
     }
     jobStatus(data)
   }
-
   return (
     <div className='pt-14 grid grid-cols-12 gap-5'>
       <div className='col-span-9 mb-10'>
@@ -249,7 +248,8 @@ const JobDetails = () => {
             {
               applicants?.map((applicant) => (
                 <div><p>{applicant.email}</p>
-                  <button onClick={() => navigate(`/user/${applicant?.email}`)}>View Details</button>
+                  <button className="bg-orange-300 mr-3 px-4 py-2 rounded-lg" onClick={() => navigate(`/user/${applicant?.email}`)}>View Details</button>
+                  <button className="bg-red-300 px-4 py-2 rounded-lg">Approved</button>
                 </div>
               ))
             }

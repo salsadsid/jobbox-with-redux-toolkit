@@ -11,7 +11,7 @@ const CandidateDetail = () => {
     const [reply, setReply] = useState("")
     const { id } = useParams()
     console.log(id)
-    const { data, isLoading } = useGetUserDetailsQuery(id)
+    const { data, isLoading } = useGetUserDetailsQuery(id, { pollingInterval: 1000 })
     const { register, handleSubmit, reset } = useForm()
     const { user } = useSelector(state => state.auth)
     const [sendMessage] = useSendMessageMutation()

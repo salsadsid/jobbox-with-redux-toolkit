@@ -68,6 +68,7 @@ const jobApi = apiSlice.injectEndpoints({
                 url: `/decending/${email}`,
             }),
         }),
+
     })
 })
 
