@@ -58,7 +58,17 @@ const jobApi = apiSlice.injectEndpoints({
             }),
             providesTags: ["Job"]
         }),
+        getAppliedJobsAscending: builder.query({
+            query: (email) => ({
+                url: `/ascending/${email}`,
+            }),
+        }),
+        getAppliedJobsDecending: builder.query({
+            query: (email) => ({
+                url: `/decending/${email}`,
+            }),
+        }),
     })
 })
 
-export const { usePostJobMutation, useGetJobsQuery, useJobByIdQuery, useApplyJobMutation, useGetAppliedJobsQuery, useAskQuestionMutation, useSendReplyMutation, useJobStatusMutation } = jobApi
+export const { usePostJobMutation, useGetJobsQuery, useJobByIdQuery, useApplyJobMutation, useGetAppliedJobsQuery, useAskQuestionMutation, useSendReplyMutation, useJobStatusMutation, useGetAppliedJobsAscendingQuery, useGetAppliedJobsDecendingQuery } = jobApi
