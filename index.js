@@ -41,6 +41,17 @@ const run = async () => {
 
       res.send({ status: false });
     });
+    app.get("/user-detail/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const result = await userCollection.findOne({ email });
+
+      if (result?.email) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
 
     app.get("/jobs", async (req, res) => {
       const cursor = jobCollection.find({});
@@ -50,18 +61,35 @@ const run = async () => {
 
     app.get("/job/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id)
+
       const result = await jobCollection.findOne({ _id: ObjectId(id) });
-      console.log(result)
+
       res.send({ status: true, data: result });
     });
 
     app.post("/job", async (req, res) => {
       const job = req.body;
-      console.log(job)
+      // console.log(job)
       const result = await jobCollection.insertOne(job);
 
       res.send({ status: true, data: result });
+    });
+    app.patch("/job", async (req, res) => {
+      const jobId = req.body.jobId;
+
+      const filter = { _id: ObjectId(jobId) };
+      const updateDoc = {
+        "$set": {
+          "status": "closed"
+        }
+      };
+      const result = await jobCollection.updateOne(filter, updateDoc);
+
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
     });
     app.patch("/apply", async (req, res) => {
       const userId = req.body.userId;
@@ -70,7 +98,7 @@ const run = async () => {
 
       const filter = { _id: ObjectId(jobId) };
       const updateDoc = {
-        $push: { applicants: { id: ObjectId(userId), email } },
+        $push: { applicants: { id: ObjectId(userId), email, dateAdded: new Date(), approved: false } },
       };
 
       const result = await jobCollection.updateOne(filter, updateDoc);
@@ -85,6 +113,24 @@ const run = async () => {
       const email = req.params.email;
       const query = { applicants: { $elemMatch: { email: email } } };
       const cursor = jobCollection.find(query).project({ applicants: 0 });
+      const result = await cursor.toArray();
+
+      res.send({ status: true, data: result });
+
+    });
+    app.get("/ascending/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { applicants: { $elemMatch: { email: email } } };
+      const cursor = jobCollection.find(query).sort({ "applicants.dateAdded": 1 }).project({ applicants: 0 });
+      const result = await cursor.toArray();
+
+      res.send({ status: true, data: result });
+
+    });
+    app.get("/decending/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { applicants: { $elemMatch: { email: email } } };
+      const cursor = jobCollection.find(query).sort({ "applicants.dateAdded": -1 }).project({ applicants: 0 });
       const result = await cursor.toArray();
 
       res.send({ status: true, data: result });
@@ -117,12 +163,35 @@ const run = async () => {
 
       res.send({ status: false });
     });
+    app.patch("/send", async (req, res) => {
+      const userId = req.body.userId;
+      const employerId = req.body.employerId;
+      const message = req.body.message;
+
+      const filter = { _id: ObjectId(userId) };
+      const updateDoc = {
+        $push: {
+          chat: {
+            employerId: employerId,
+            message: message,
+            reply: [],
+          },
+        },
+      };
+
+      const result = await userCollection.updateOne(filter, updateDoc);
+
+      if (result?.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
 
     app.patch("/reply", async (req, res) => {
       const userId = req.body.userId;
       const reply = req.body.reply;
-      console.log(reply);
-      console.log(userId);
+
 
       const filter = { "queries.id": ObjectId(userId) };
 
@@ -136,6 +205,33 @@ const run = async () => {
       };
 
       const result = await jobCollection.updateOne(
+        filter,
+        updateDoc,
+        arrayFilter
+      );
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
+    app.patch("/msg-reply", async (req, res) => {
+      const employerId = req.body.employerId;
+      const reply = req.body.reply;
+
+
+      const filter = { "chat.employerId": employerId };
+
+      const updateDoc = {
+        $push: {
+          "chat.$[user].reply": reply,
+        },
+      };
+      const arrayFilter = {
+        arrayFilters: [{ "user.employerId": employerId }],
+      };
+
+      const result = await userCollection.updateOne(
         filter,
         updateDoc,
         arrayFilter

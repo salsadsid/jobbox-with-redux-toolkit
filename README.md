@@ -4,4 +4,4 @@
 ### Author: [Salman Sadik Siddiquee](https://github.com/salsadsid)
 ### Client : [jobBox](https://jobbox-salsadsid.netlify.app/)
 ### Client (code): [jobBox](https://github.com/salsadsid/jobbox-with-redux-toolkit)
-### Server (code): [jobBox](https://github.com/salsadsid/jobbox-with-redux-toolkit-server)
+### Server (code): [jobBox](https://github.com/salsadsid/jobbox-with-redux-toolkit-server){:target="_blank" rel="noopener"}
